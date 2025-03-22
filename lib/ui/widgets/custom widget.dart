@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_app/model/tast_provider.dart';
+import 'package:todo_app/model/task_provider.dart';
 
 import '../../constants/constant.dart';
 import '../screen/task_screen.dart';
@@ -114,7 +114,6 @@ class _CustomDialogState extends State<CustomDialog> {
                         TimeOfDay? time = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now());
-
                         taskProvider.setTime(time);
                       },
                       icon: Icon(Icons.timer)),
