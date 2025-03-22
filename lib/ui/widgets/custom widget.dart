@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_app/model/tast_provider.dart';
 
 import '../../constants/constant.dart';
 import '../screen/task_screen.dart';
@@ -29,12 +31,19 @@ class CustomFloatingButton extends StatelessWidget {
   }
 }
 
-class CustomDialog extends StatelessWidget {
+class CustomDialog extends StatefulWidget {
   CustomDialog({
     super.key,
   });
+
+  @override
+  State<CustomDialog> createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<CustomDialog> {
   @override
   Widget build(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context,listen: false);
     final sh = MediaQuery.of(context).size.height;
     final sw = MediaQuery.of(context).size.width;
     return Dialog(
@@ -67,6 +76,9 @@ class CustomDialog extends StatelessWidget {
                   height: sh * .015,
                 ),
                 CustomField(
+                  onchange: (value){
+                    taskProvider.setTask(value);
+                  },
                   hint: 'Enter a Task',
                 ),
                 SizedBox(
@@ -84,10 +96,11 @@ class CustomDialog extends StatelessWidget {
                   hint: 'Enter a Date',
                   iconButton: IconButton(
                       onPressed: () async {
-                        await showDatePicker(
+                       DateTime? date =  await showDatePicker(
                             context: context,
                             firstDate: DateTime(2015),
                             lastDate: DateTime(2030));
+                        taskProvider.setDate(date);
                       },
                       icon: Icon(Icons.date_range)),
                 ),
@@ -98,9 +111,11 @@ class CustomDialog extends StatelessWidget {
                   hint: 'Enter a Time',
                   iconButton: IconButton(
                       onPressed: () async {
-                        final datepick = await showTimePicker(
+                        TimeOfDay? time = await showTimePicker(
                             context: context,
-                            initialTime: TimeOfDay(hour: 4, minute: 00));
+                            initialTime: TimeOfDay.now());
+
+                        taskProvider.setTime(time);
                       },
                       icon: Icon(Icons.timer)),
                 ),
@@ -111,6 +126,7 @@ class CustomDialog extends StatelessWidget {
                   alignment: Alignment.center,
                   child: ElevatedButton(
                       onPressed: () {
+                        taskProvider.addTask();
                         Navigator.of(context).pop();
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: accent),
@@ -132,16 +148,19 @@ class CustomField extends StatelessWidget {
   final String hint;
   final IconButton? iconButton;
   final bool readOnly;
+  final ValueChanged? onchange;
   const CustomField({
     super.key,
     required this.hint,
     this.iconButton,
     this.readOnly = false,
+    this.onchange
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      onChanged: onchange,
       readOnly: readOnly,
       decoration: InputDecoration(
           suffixIcon: iconButton,
